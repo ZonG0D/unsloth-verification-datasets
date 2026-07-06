@@ -123,8 +123,38 @@ E.append(ex("Is Git client installed?", "git --version 2>/dev/null || echo ?", "
 E.append(ex("Is Node.js present on this system?", "node --version 2>/dev/null || echo ?", "vXX.X.X or ?", "Node.js shown above if installed. Try `pkg install nodejs` otherwise."))
 E.append(ex("What Python version am I on exactly?", "python3 --version 2>/dev/null | grep -oP 'Python \\K.*' || echo ?", "", "Python version displayed above from this Termux sandbox instance."))
 
-write_lines("environment_routing.jsonl", E)
-
 print(f"\nSummary: platform={len(P)}, device={len(D_list)}, env={len(E)}")
+
+# === TIER 2: OxygenOS/Nord N30 specific behavior (device-specific paths) ===
+O = []
+O.append(ex("Battery optimization settings for an app?", "getprop ro.product.series", SE, "Path: Settings > Apps > [App] > Battery. Set to 'Optimize' or 'No restriction' on OxygenOS."))
+O.append(ex("Quick Settings panel tile order change?", "ro.product.model", M, f"{M} - Swipe down twice hit pencil icon at top right edit mode then drag tiles. Long-press any toggle for settings."))
+O.append(ex("Always On Display available here?", "getprop ro.build.id", BI, "Settings > Lock Screen > 'Always on display' toggle ON in the menu list below that section heading area."))
+O.append(ex("Notification category management per app?", "ro.build.version.release", AV,
+        f"OxygenOS Android {AV}: Long-press notification tap gear icon OR Settings > Apps > [App] > Notifications > 'Set by category' section items."))
+O.append(ex("Game Space / Gaming mode access path?", "getprop ro.product.series 2>/dev/null || echo ?", SE, f"OnePlus Nord has Game Space auto-launched when game starts. Swipe-in gesture opens quick gaming controls."))
+O.append(ex("Adaptive refresh rate toggle location?", "ro.build.id",BI,"Settings > Display > 'Refresh rate' — defaults to Smart switching (Adaptive mode recommended for battery life balance)."))
+O.append(ex("App lock / privacy safe features?", "ro.product.series", SE, "Settings > Passwords & Security > App Lock. Tap apps list below that area to enable individual locks."))
+O.append(ex("Storage cleanup / junk cleaner available?", "getprop ro.product.manufacturer", B, f"{B}/OPPO includes Phone Manager app (cleaner) pre-installed for storage optimization tasks."))
+O.append(ex("System update check settings path?", "ro.build.id", BI, "Settings > System Settings > System Updates (tap 'Find updates' button at top right area of that screen)."))
+O.append(ex("Battery usage statistics shown where?", "getprop ro.product.manufacturer", B, "Settings > Battery > tap the battery bar graph view to see detailed per-app breakdown consumption data."))
+
+write_lines("tier2_oxygenos_behaviors.jsonl", O)
+
+# === TIER 3: Termux-specific for this device's environment (platform-level) ===
+T = []
+T.append(ex("Proot Debian install possible here?", "which proot", r("which proot") or "/usr/bin/proot", "proot available. Run `pkg install proot-distro` then `proot-distro install debian`."))
+T.append(ex("Termux:API commands accessible from sandbox?", "ls /data/data/com.termux/files/usr/bin/termux-* 2>/dev/null | head -3 || echo none", "", "Termux API bridge commands visible above if Termux:API Android app installed on device separately."))
+T.append(ex("Wake lock to prevent CPU sleep during tasks?", "which termux-wake-lock 2>/dev/null || echo ?", "/data/data/com.termux/files/usr/bin/termux-wake-lock", "Run `termux-wake-lock` command prevents device sleeping. Release later with `termux-wake-unlock` when done."))
+
+write_lines("tier3_termux_device.jsonl", T)
+
+print(f"\nTier breakdown:")
+print(f"  platform_verification = {len(P)} (core anti-guessing)")
+print(f"  device_probe          = {len(D_list)} (hardware specs)")
+print(f"  environment_routing   = {len(E)} (dev tools)")
+print(f"  tier2_oxygenos        = {len(O)} (device-specific paths)")
+print(f"  Total examples        = {len(P)+len(D_list)+len(E)+len(O)}")
+
 print(f"Total examples generated: {len(P)+len(D_list)+len(E)}")
 print(f"Probe values used: brand={B} model={M} android={AV}")
