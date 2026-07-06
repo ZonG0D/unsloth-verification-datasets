@@ -21,7 +21,7 @@ All files use Unsloth Studio compatible JSONL format with multi-turn conversatio
 - Real output from those commands  
 - Final synthesized answer using actual data
 
-## Fixes Applied (2025-07-05)
+## Fixes Applied (2026-07-06)
 - **Unique tool call IDs** — all `tc_*` prefixed, globally unique across dataset
 - **Richer system prompts** — expanded from 49 chars to match Hermes' actual multi-paragraph system messages
 - **Multi-step chains added** — model now learns 2-3 sequential tool calls before answering
