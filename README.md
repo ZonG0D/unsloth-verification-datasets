@@ -7,13 +7,20 @@ Fine-tuning datasets that teach 3B-class models to use terminal commands for act
 
 | File | Examples | Focus Area |
 |------|----------|------------|
-| `platform_verification.jsonl` | 20 | OS skin detection, brand identification |
-| `device_probe.jsonl` | 17 | Hardware facts (RAM, resolution, kernel) |  
-| `environment_routing.jsonl` | 6 | System capability verification |
-| `tier2_oxygenos_behaviors.jsonl` | 10 | OxygenOS-specific settings & features |
-| `tier3_termux_device.jsonl` | 3 | Termux/Android device probes |
-| `multi_step_chains.jsonl` | 5 | Chained tool calls (2-3 tools before answer) |
-| `direct_text_responses.jsonl` | 6 | Plain text replies without tool calls |
+| `platform_verification.jsonl` | 20 | OS/brand anti-hallucination |
+| `device_probe.jsonl` | 17 | Hardware specs (RAM, kernel, arch) |
+| `environment_routing.jsonl` | 6 | Dev tool presence checks |
+| `tier2_oxygenos_behaviors.jsonl` | 10 | OxygenOS settings & paths |
+| `tier3_termux_device.jsonl` | 3 | Termux sandbox probes |
+| `multi_step_chains.jsonl` | 5 | Sequential 2-3 tool calls |
+| `multi_step_reasoning.jsonl` | 4 | Intermediate analysis between steps |
+| `direct_text_responses.jsonl` | 6 | Plain text replies without tools |
+| `mixed_response_routing.jsonl` | 12 | Direct answer vs tool call routing (50/50) |
+| `system_prompt_generalization.jsonl` | 6 | Short + full Hermes system prompts |
+| `error_handling.jsonl` | 8 | Command failures → graceful responses |
+| `meta_conversation.jsonl` | 4 | Multi-turn follow-ups + constraints |
+
+**Total: 101 examples across 12 files**
 
 ## Format
 All files use Unsloth Studio compatible JSONL format with multi-turn conversations including:
