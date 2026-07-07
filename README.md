@@ -1,49 +1,65 @@
-# Unsloth Verification Datasets
+# Unsloth Verification Datasets 
 
-## Purpose
-Fine-tuning datasets that teach 3B-class models to use terminal commands for actual verification instead of guessing from training priors. Target: fix "static mind" problem where LLM repeats platform/OS/device mistakes.
+A specialized collection of high-quality conversational datasets designed for fine-tuning LLMs on agentic workflows, system capability verification, and tool-use precision. All datasets are provided in **ChatML / OpenAI Conversational format**, making them directly compatible with [Unsloth Studio](https://unsloth.ai/) and various training recipes.
 
-## Dataset Contents
+## Repository Structure
 
-| File | Examples | Focus Area |
-|------|----------|------------|
-| `platform_verification.jsonl` | 20 | OS/brand anti-hallucination |
-| `device_probe.jsonl` | 17 | Hardware specs (RAM, kernel, arch) |
-| `environment_routing.jsonl` | 6 | Dev tool presence checks |
-| `tier2_oxygenos_behaviors.jsonl` | 10 | OxygenOS settings & paths |
-| `tier3_termux_device.jsonl` | 3 | Termux sandbox probes |
-| `multi_step_chains.jsonl` | 5 | Sequential 2-3 tool calls |
-| `multi_step_reasoning.jsonl` | 4 | Intermediate analysis between steps |
-| `direct_text_responses.jsonl` | 6 | Plain text replies without tools |
-| `mixed_response_routing.jsonl` | 12 | Direct answer vs tool call routing (50/50) |
-| `system_prompt_generalization.jsonl` | 6 | Short + full Hermes system prompts |
-| `error_handling.jsonl` | 8 | Command failures → graceful responses |
-| `meta_conversation.jsonl` | 4 | Multi-turn follow-ups + constraints |
+All datasets are organized in the `data/` directory to separate raw training materials from project documentation.
 
-**Total: 101 examples across 12 files**
+```text
+.
+├── README.md # This file
+└── data/ # Training Datasets (.jsonl)
+ ├── agentic_reasoning.jsonl # Complex multi-step chains
+ ├── env_routing.jsonl # Environment capability checks
+ ├── error_handling.jsonl # Robustness & fallback handling
+ ├── hardware_probe.jsonl # Device/Hardware capabilities
+ ├── meta_conversations.jsonl # Conversational meta-interactions
+ ├── mixed_routing.jsonl # Complex routing logic
+ ├── platform_oxygenos.jsonl # OxygenOS specific behaviors
+ ├── platform_termux.jsonl # Termux environment behavior
+ ├── platform_verify.jsonl # General platform verification
+ ├── sys_prompt_variations.jsonl # System prompt robustness tests
+ ├── text_only_replies.jsonl # Direct non-tool responses
+ └── tool_execution_chains.jsonl # Standard execution flows
+```
 
-## Format
-All files use Unsloth Studio compatible JSONL format with multi-turn conversations including:
-- Tool calling chain (terminal command)
-- Real output from those commands  
-- Final synthesized answer using actual data
+## Dataset Taxonomy (Training Objectives)
 
-## Fixes Applied (2026-07-06)
-- **Unique tool call IDs** — all `tc_*` prefixed, globally unique across dataset
-- **Richer system prompts** — expanded from 49 chars to match Hermes' actual multi-paragraph system messages
-- **Multi-step chains added** — model now learns 2-3 sequential tool calls before answering
-- **Direct text responses added** — 6 examples of assistant replying without tools (prevents empty-response bug)
-- **Enriched short answers** — responses under 40 chars elaborated to provide more training signal
+Use these categories to select specific data slices for focused fine-tuning:
 
-## Training Recommendations
-- **Base model**: Qwen2.5-3B-Instruct or qwen3.6-class models
-- **Method**: QLoRA, rank 128 (full fine-tune for <1B parameter models)
-- **LR**: 1-2e-4 
-- **Epochs**: 2-3 (behavioral routing preference needs more exposure)
-- **Batch size**: 4-8 (depends on VRAM)
+| Category | Datasets | Training Objective |
+| :--- | :--- | :--- |
+| **Agentic Intelligence** | `agentic_reasoning`, `tool_execution_chains` | Master multi-step tool calling and complex reasoning chains. |
+| **System Robustness** | `error_handling`, `sys_prompt_variations` | Teach the model to handle errors gracefully and follow diverse system prompts. |
+| **Platform Awareness** | `hardware_probe`, `platform_oxygenos`, `platform_termux`, `platform_verify` | Deep understanding of device hardware, OS behaviors (OxygenOS), and terminal environments. |
+| **Conversation Flow** | `meta_conversations`, `text_only_replies`, `mixed_routing` | Improve natural conversational flow, meta-talk, and intelligent response routing. |
 
-## Upload to Unsloth Studio
-1. Drag `.jsonl` files into Data Recipes panel
-2. Select base model from supported list
-3. Train with recommended presets above
-4. Test via API endpoint or chat interface
+## Data Format Specification
+
+Each entry in the `.jsonl` files follows a strict ChatML structure:
+
+```json
+{
+ "messages": [
+ {"role": "system", "content": "...(Expanded Hermes-style Prompt)..."},
+ {"role": "user", "content": "...(Natural Language Query)..."},
+ {
+ "role": "assistant", 
+ "content": null, 
+ "tool_calls": [{"type": "function", "id": "tc_...", "function": {"name": "...", "arguments": "{...}"}}]
+ },
+ {"role": "tool", "content": "...(Result)...", "tool_call_id": "tc_..."},
+ {"role": "assistant", "content": "...(Final Answer)..."}
+ ]
+}
+```
+
+### Key Technical Improvements (v2.0)
+- **Standardized Naming**: Unified `snake_case` naming for easy script integration.
+- **Tool ID Integrity**: Guaranteed unique and perfectly matched tool call/response IDs (`tc_***`).
+- **Semantic Alignment**: Filenames now match the internal `metadata.category` fields.
+- **Zero Duplicates**: Strictly deduplicated across all categories using content hashing.
+
+---
+*Maintained for high-precision agent training.*
